@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
                     },
                     actions = {
                         IconButton(onClick = { expanded = true }) {
-                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
+                            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = null)
                         }
                         DropdownMenu(
                             expanded = expanded,
@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
                                 text = { Text("簡介", color = Color.Blue) },
                                 onClick = {
                                     selectedOption = "簡介"
+                                    currentView = "服務總覽"
                                     expanded = false
                                 }
                             )
@@ -94,14 +95,16 @@ class MainActivity : ComponentActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Button(onClick = { currentView = "台中市愛心家園" }) {
-                            Text("台中市愛心家園")
-                        }
-                        Button(onClick = { currentView = "瑪利亞學園" }) {
-                            Text("瑪利亞學園")
+                    if (selectedOption == "主要機構") {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Button(onClick = { currentView = "台中市愛心家園" }) {
+                                Text("台中市愛心家園")
+                            }
+                            Button(onClick = { currentView = "瑪利亞學園" }) {
+                                Text("瑪利亞學園")
+                            }
                         }
                     }
 
@@ -112,6 +115,32 @@ class MainActivity : ComponentActivity() {
                     ) {
                         item {
                             when (currentView) {
+                                "服務總覽" -> {
+                                    Text(
+                                        text = "瑪利亞基金會服務總覽",
+                                        color = Color.Blue,
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                    Button(onClick = {
+                                        currentView = if (currentView == "服務總覽") "作者：資管二B黃子鑒" else "服務總覽"
+                                    }) {
+                                        Text(text = if (currentView == "服務總覽") "作者：資管二B黃子鑒" else "服務總覽")
+                                    }
+                                }
+                                "作者：資管二B黃子鑒" -> {
+                                    Text(
+                                        text = "關於App作者",
+                                        color = Color.Blue,
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                    Button(onClick = {
+                                        currentView = if (currentView == "服務總覽") "作者：資管二B黃子鑒" else "服務總覽"
+                                    }) {
+                                        Text(text = if (currentView == "服務總覽") "作者：資管二B黃子鑒" else "服務總覽")
+                                    }
+                                }
                                 "台中市愛心家園" -> {
                                     Text(
                                         text = "台中市愛心家園經市政府公開評選後，委託瑪利亞基金會經營管理，於91年啟用，整棟建築物有四個樓層，目前開辦就醫、就養、就學、就業四大領域的十項業務，提供身心障礙者全方位的服務。",
@@ -127,14 +156,13 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                 }
-                                "瑪利亞學園" ->{
+                                "瑪利亞學園" -> {
                                     Text(
                                         text = "「瑪利亞學園」提供重度以及極重度多重障礙者日間照顧服務，以健康照護為基礎，支持生活多面向參與及學習概念，輔助發展重度身心障礙者自我概念為最終服務目標。",
                                         color = Color.Black,
                                         style = MaterialTheme.typography.headlineMedium.copy(fontSize = 16.sp),
                                         modifier = Modifier.fillMaxWidth()
                                     )
-
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text(
                                         text = "雙擊以下圖片，可以觀看瑪利亞學園地圖",
@@ -142,22 +170,17 @@ class MainActivity : ComponentActivity() {
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
                                     )
-
                                 }
-
-
-
                             }
                         }
                     }
 
                     val imageRes = when (currentView) {
+                        "服務總覽" -> R.drawable.service
+                        "作者：資管二B黃子鑒" -> R.drawable.face
                         "台中市愛心家園" -> R.drawable.lovehome
-                        else -> R.drawable.campus // 預設圖片資源
-                    }
-                    val ImageRes = when (currentView) {
                         "瑪利亞學園" -> R.drawable.campus
-                        else -> R.drawable.lovehome // 預設圖片資源
+                        else -> R.drawable.service
                     }
 
                     val alpha by animateFloatAsState(
@@ -190,11 +213,21 @@ class MainActivity : ComponentActivity() {
                                                 context.startActivity(intent)
                                             }
                                         }
+                                    },
+                                    onDoubleTap = {
+                                        if (currentView == "瑪利亞學園") {
+                                            coroutineScope.launch {
+                                                val uri =
+                                                    Uri.parse("geo:0,0?q=高雄市左營區新莊一路388號")
+                                                val intent = Intent(Intent.ACTION_VIEW, uri)
+                                                intent.setPackage("com.google.android.apps.maps")
+                                                context.startActivity(intent)
+                                            }
+                                        }
                                     }
                                 )
                             }
                     )
-
                 }
             }
         )
